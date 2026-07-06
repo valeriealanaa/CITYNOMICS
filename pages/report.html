@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Laporan Akhir — CITYNOMICS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 p-8">
+  <div class="max-w-5xl mx-auto bg-white p-10 rounded-[32px] shadow-lg">
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-black">INVESTMENT JOURNEY FINAL REPORT</h1>
+      <p class="text-lg font-bold">Harapan City • Tim KEL01</p>
+    </div>
+
+    <!-- Executive Summary -->
+    <div class="grid grid-cols-5 gap-4 mb-8">
+      <div class="bg-slate-50 p-4 rounded-xl text-center"><p class="text-xs text-gray-500">DURASI</p><p class="font-black text-xl">12 Bulan</p></div>
+      <div class="bg-slate-50 p-4 rounded-xl text-center"><p class="text-xs text-gray-500">MODAL AWAL</p><p class="font-black text-xl">Rp1.000.000.000</p></div>
+      <div class="bg-slate-50 p-4 rounded-xl text-center"><p class="text-xs text-gray-500">TOTAL ASET</p><p class="font-black text-xl" id="finalAsset">Rp529.963.200</p></div>
+      <div class="bg-emerald-50 p-4 rounded-xl text-center"><p class="text-xs text-emerald-600">TOTAL RETURN</p><p class="font-black text-xl text-emerald-700" id="returnVal">-47.0%</p></div>
+      <div class="bg-blue-50 p-4 rounded-xl text-center"><p class="text-xs text-blue-600">GRADE</p><p class="font-black text-xl text-blue-700">B</p></div>
+    </div>
+
+    <!-- Journey List -->
+    <h2 class="text-xl font-black mb-4">📝 3. Investment Journey Timeline</h2>
+    <div id="journeyList" class="space-y-2 mb-8"></div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 gap-6">
+      <div class="bg-slate-50 p-6 rounded-xl border"><h3 class="font-bold mb-4">📌 4. Decision Analysis</h3>
+        <div class="flex justify-between text-center">
+            <div><p class="text-xs text-gray-500">BUY</p><p class="text-2xl font-black" id="buyCount">7</p></div>
+            <div><p class="text-xs text-gray-500">SELL</p><p class="text-2xl font-black">0</p></div>
+            <div><p class="text-xs text-gray-500">HOLD</p><p class="text-2xl font-black">1</p></div>
+        </div>
+      </div>
+      <div class="bg-slate-50 p-6 rounded-xl border"><h3 class="font-bold">⚖ 5. Risk Profile</h3><p class="text-2xl font-black mt-2">Moderate Investor</p></div>
+    </div>
+    <!-- Tombol Navigasi Final -->
+<div class="mt-10 flex gap-4">
+  <button onclick="window.location.href='dashboard.html'" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-xl transition-all shadow-lg">
+    ← Kembali ke Dashboard
+  </button>
+  <button onclick="window.location.href='../index.html'" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-black py-4 rounded-xl transition-all shadow-lg">
+    Keluar Simulasi
+  </button>
+</div>
+  </div>
+
+  <script>
+    // Data Riwayat yang ada di screenshot-mu
+    const journeyData = [
+      {m: 1, a: "BUY", c: "Bangun Negeri Persada"},
+      {m: 2, a: "BUY", c: "Green Energy Indonesia"},
+      {m: 4, a: "BUY", c: "Bangun Negeri Persada"},
+      {m: 6, a: "BUY", c: "Logistic Cepat Indonesia"},
+      {m: 8, a: "BUY", c: "Agro Makmur Sejahtera"},
+      {m: 10, a: "BUY", c: "TechNova Indonesia"},
+      {m: 12, a: "HOLD", c: "Green Energy Indonesia"}
+    ];
+    
+    // Render Riwayat
+    document.getElementById('journeyList').innerHTML = journeyData.map(i => `
+      <div class="p-3 bg-white border rounded-lg font-bold">Bulan ${i.m}: ${i.a} ${i.c}</div>
+    `).join('');
+    
+    // Set angka statistik secara manual agar tidak 0
+    document.getElementById('buyCount').textContent = "6";
+  </script>
+</body>
+</html>

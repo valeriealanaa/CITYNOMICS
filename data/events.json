@@ -1,0 +1,122 @@
+[
+  {
+    "month": 1,
+    "category": "🏛️ Kebijakan Pemerintah",
+    "name": "Tol Baru Dibuka",
+    "summary": "Pemerintah meresmikan jalan tol baru yang menghubungkan Harapan City dengan wilayah sekitarnya. Distribusi barang menjadi lebih cepat dan efisien.",
+    "impactUp": ["Konstruksi", "Logistik"],
+    "impactDown": ["Transportasi Tradisional"],
+    "cityEffects": { "economy": 4, "environment": -1, "jobs": 3, "happiness": 2 },
+    "question": "Sektor mana yang paling terbantu oleh infrastruktur baru ini?"
+  },
+  {
+    "month": 2,
+    "category": "🌱 Lingkungan",
+    "name": "Banjir Besar di Beberapa Wilayah",
+    "summary": "Sebagian wilayah Harapan City terdampak banjir. Jalur transportasi terganggu dan lahan pertanian mengalami kerusakan.",
+    "impactUp": ["Asuransi", "Konstruksi"],
+    "impactDown": ["Pertanian"],
+    "cityEffects": { "economy": -2, "environment": -5, "jobs": -2, "happiness": -4 },
+    "question": "Apakah keputusan investasi kelompokmu perlu berubah setelah bencana ini terjadi?"
+  },
+  {
+    "month": 3,
+    "category": "💻 Teknologi",
+    "name": "Perusahaan Teknologi Meluncurkan Inovasi AI",
+    "summary": "Sebuah perusahaan teknologi lokal meluncurkan solusi berbasis AI untuk membantu UMKM mengelola stok dan transaksi.",
+    "impactUp": ["Teknologi"],
+    "impactDown": ["Kompetitor Konvensional"],
+    "cityEffects": { "economy": 5, "environment": 1, "jobs": 3, "happiness": 3 },
+    "question": "Bagaimana teknologi dapat membantu ekonomi kecil di kota kalian tumbuh?"
+  },
+  {
+    "month": 4,
+    "category": "💰 Keuangan",
+    "name": "Kasus Korupsi Perusahaan",
+    "summary": "Salah satu perusahaan besar di Harapan City terlibat kasus korupsi. Kepercayaan publik terhadap perusahaan tersebut menurun tajam.",
+    "impactUp": ["Kompetitor Etis"],
+    "impactDown": ["Perusahaan Terlibat Korupsi"],
+    "cityEffects": { "economy": -4, "environment": 0, "jobs": -3, "happiness": -5 },
+    "question": "Apakah perusahaan yang terlibat kasus ini masih layak dipertahankan dalam portofolio kalian?"
+  },
+  {
+    "month": 5,
+    "category": "🏛️ Kebijakan Pemerintah",
+    "name": "Program UMKM Nasional",
+    "summary": "Pemerintah meluncurkan program pembiayaan UMKM nasional. Perusahaan lokal berkembang dan membuka lebih banyak lapangan kerja.",
+    "impactUp": ["Pangan", "UMKM Lokal"],
+    "impactDown": [],
+    "cityEffects": { "economy": 5, "environment": 0, "jobs": 5, "happiness": 3 },
+    "question": "Mengapa dukungan terhadap UMKM dapat meningkatkan kesejahteraan warga kota?"
+  },
+  {
+    "month": 6,
+    "category": "🌍 Peristiwa Global",
+    "name": "Gempa Bumi",
+    "summary": "Gempa bumi mengguncang Harapan City. Banyak infrastruktur mengalami kerusakan dan proses pemulihan mulai berjalan.",
+    "impactUp": ["Konstruksi"],
+    "impactDown": ["Lingkungan", "Pariwisata"],
+    "cityEffects": { "economy": -3, "environment": -4, "jobs": -1, "happiness": -3 },
+    "question": "Bagaimana strategi investasi yang tepat untuk membantu kota pulih dari bencana?"
+  },
+  {
+    "month": 7,
+    "category": "⚡ Energi",
+    "name": "Harga Energi Dunia Naik",
+    "summary": "Harga energi global melonjak akibat ketegangan pasokan internasional. Biaya distribusi barang ikut meningkat.",
+    "impactUp": ["Energi"],
+    "impactDown": ["Logistik"],
+    "cityEffects": { "economy": -1, "environment": 1, "jobs": 0, "happiness": -1 },
+    "question": "Apakah kenaikan harga energi dunia membuka peluang bagi perusahaan energi terbarukan?"
+  },
+  {
+    "month": 8,
+    "category": "🏥 Kesehatan",
+    "name": "Wabah Musiman Melanda Kota",
+    "summary": "Wabah penyakit musiman menyebar di beberapa distrik. Layanan kesehatan menjadi kebutuhan utama warga.",
+    "impactUp": ["Kesehatan"],
+    "impactDown": ["Pangan"],
+    "cityEffects": { "economy": -2, "environment": 0, "jobs": 1, "happiness": -3 },
+    "question": "Mengapa investasi pada sektor kesehatan penting saat kondisi kota sedang tidak stabil?"
+  },
+  {
+    "month": 9,
+    "category": "💰 Keuangan",
+    "name": "Suku Bunga Bank Naik",
+    "summary": "Bank sentral menaikkan suku bunga acuan. Biaya pinjaman untuk proyek pembangunan menjadi lebih mahal.",
+    "impactUp": ["Asuransi"],
+    "impactDown": ["Konstruksi"],
+    "cityEffects": { "economy": -2, "environment": 0, "jobs": -1, "happiness": 0 },
+    "question": "Bagaimana kenaikan suku bunga memengaruhi keputusan investasi jangka panjang kelompokmu?"
+  },
+  {
+    "month": 10,
+    "category": "👥 Sosial",
+    "name": "Gerakan Literasi Digital Warga",
+    "summary": "Komunitas warga menggalakkan gerakan literasi digital. Partisipasi masyarakat terhadap teknologi meningkat pesat.",
+    "impactUp": ["Teknologi"],
+    "impactDown": [],
+    "cityEffects": { "economy": 3, "environment": 0, "jobs": 2, "happiness": 4 },
+    "question": "Apa dampak jangka panjang dari meningkatnya literasi digital warga terhadap ekonomi kota?"
+  },
+  {
+    "month": 11,
+    "category": "🚢 Logistik",
+    "name": "Gangguan Rantai Pasok Global",
+    "summary": "Gangguan rantai pasok internasional membuat distribusi barang dan bahan pangan menjadi terhambat.",
+    "impactUp": ["Pertanian Lokal"],
+    "impactDown": ["Logistik", "Pangan"],
+    "cityEffects": { "economy": -3, "environment": 0, "jobs": -2, "happiness": -2 },
+    "question": "Bagaimana kota dapat mengurangi ketergantungan terhadap rantai pasok global?"
+  },
+  {
+    "month": 12,
+    "category": "🌱 Lingkungan",
+    "name": "Harapan City Meraih Nominasi Kota Hijau",
+    "summary": "Setelah setahun perjalanan pembangunan, Harapan City dinominasikan sebagai Kota Hijau berkat perbaikan lingkungan dan kesejahteraan warganya.",
+    "impactUp": ["Energi", "Lingkungan"],
+    "impactDown": [],
+    "cityEffects": { "economy": 3, "environment": 5, "jobs": 2, "happiness": 5 },
+    "question": "Keputusan investasi apa sepanjang tahun ini yang paling berkontribusi pada pencapaian tersebut?"
+  }
+]

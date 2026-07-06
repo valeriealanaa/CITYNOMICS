@@ -1,0 +1,11 @@
+{
+  "name": "Harapan City",
+  "population": 250000,
+  "economy": 42,
+  "environment": 50,
+  "jobs": 38,
+  "happiness": 40,
+  "infrastructure": 44,
+  "fund": 1000000000,
+  "month": 1
+}

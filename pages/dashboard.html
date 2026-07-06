@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulasi CITYNOMICS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/custom.css?v=1783252773">
+</head>
+<body>
+  <header class="topbar">
+    <div class="app-shell flex items-center justify-between py-4">
+      <a href="../index.html" class="text-decoration-none">
+        <h1 class="brand-text text-[34px] leading-none">CITY<span>NOMICS</span></h1>
+        <p class="mt-1 text-xs font-extrabold text-slate-500">Simulasi Investasi • Membangun Kota</p>
+      </a>
+      <div class="hidden items-center gap-4 lg:flex">
+        <div class="panel-soft px-4 py-3">
+          <p class="text-[11px] font-black uppercase text-slate-400">Bulan</p>
+          <p class="font-black"><span id="monthText">1</span> / 12</p>
+        </div>
+        <div class="panel-soft px-4 py-3">
+          <p class="text-[11px] font-black uppercase text-slate-400">Saldo Dana</p>
+          <p class="font-black text-emerald-600" id="fundText">Rp1.000.000.000</p>
+        </div>
+        <div class="panel-soft px-4 py-3">
+          <p class="text-[11px] font-black uppercase text-slate-400">Skor Kota</p>
+          <p class="font-black"><span id="scoreText">36</span> / 100</p>
+        </div>
+        <div class="hidden panel-soft px-4 py-3 xl:block">
+          <p class="text-[11px] font-black uppercase text-slate-400">Tim</p>
+          <p class="font-black" id="teamNameText">Investor</p>
+        </div>
+        <button class="btn-secondary" id="logoutBtn">Keluar</button>
+      </div>
+      <button class="hamburger btn-primary" id="menuBtn">Menu</button>
+    </div>
+    <div class="mobile-menu app-shell pb-4" id="mobileMenu">
+      <a class="nav-link py-2" href="../index.html">Landing</a>
+      <a class="nav-link py-2" href="company.html">Semua Perusahaan</a>
+      <a class="nav-link py-2" href="report.html">Final Report</a>
+      <a class="nav-link py-2" href="#" id="mobileLogoutBtn">Keluar</a>
+    </div>
+  </header>
+
+  <main class="app-shell py-5">
+    <div class="dashboard-layout">
+      <aside class="sidebar">
+        <div class="stepper" id="stageStepper"></div>
+        <div class="mt-8 rounded-[10px] border border-white/10 bg-white/5 p-4">
+          <p class="text-sm font-black text-emerald-300">Harapan City</p>
+          <p class="mt-3 text-sm font-semibold leading-6 text-slate-300">Dewan Investor Kota bertugas membangun kota yang sejahtera dan berkelanjutan.</p>
+          <div class="mt-5 grid gap-3 text-sm font-bold text-slate-200">
+            <span>👥 250.000 jiwa</span>
+            <span>🏛️ City Investment Council</span>
+          </div>
+        </div>
+        <div class="mt-4 grid gap-2">
+          <a class="side-item" href="company.html">🏢 Semua Perusahaan</a>
+          <a class="side-item" href="report.html">📄 Laporan Akhir</a>
+          <button class="side-item" id="resetSimulationBtn" style="width:100%; text-align:left; border:0; cursor:pointer;">🔄 Ulangi Simulasi</button>
+        </div>
+      </aside>
+
+      <section class="dashboard-main grid gap-4">
+        <div class="panel p-5 md:p-7" id="stageContainer">
+        <div class="panel p-5 hidden" id="eventImpactPanel">
+
+    <p class="text-xs font-black uppercase text-orange-500">
+        Dampak Event Terhadap Pasar
+    </p>
+
+    <div id="eventImpactContent"></div>
+
+</div>
+<div class="panel p-5 hidden" id="transactionPanel">
+    <p class="text-xs font-black uppercase text-emerald-600">
+        Hasil Keputusan Bulan Ini
+    </p>
+
+    <div id="transactionContent" class="mt-3"></div>
+
+</div>
+<div class="panel p-5">
+
+    <p class="text-xs font-black uppercase text-emerald-600">
+        Portfolio
+    </p>
+
+    <h2 class="mt-1 text-2xl font-black">
+        Investasi Saat Ini
+    </h2>
+
+    <div id="portfolioDashboard"
+         class="mt-4 grid gap-3">
+
+    </div>
+
+</div>
+        <div class="panel p-4" id="journeyPanel">
+          <p class="text-xs font-black uppercase text-emerald-600">Investment Journey</p>
+          <h2 class="mt-1 text-2xl font-black tracking-[-0.04em]">Riwayat Keputusan</h2>
+          <div class="mt-4 min-h-[130px] rounded-[10px] bg-slate-50 p-4" id="journeyList">
+            <p class="text-sm font-semibold text-slate-500">Belum ada keputusan. Ikuti tahapan simulasi untuk memulai Investment Journey.</p>
+          </div>
+        </div>
+      </section>
+      
+      <aside class="ai-panel panel">
+        <div class="bg-slate-950 px-5 py-4 text-white">
+          <p class="text-xs font-black uppercase text-emerald-300">AI Mentor</p>
+          <h2 class="text-xl font-black">CityMentor</h2>
+        </div>
+        <div class="chat-list grid content-start gap-3" id="chatList"></div>
+        <hr class="my-3">
+
+<div class="px-3 pb-3">
+
+    <p class="text-xs font-black uppercase text-emerald-600">
+        Portfolio Live
+    </p>
+
+    <div id="portfolioList"
+         class="mt-3 grid gap-3">
+
+    </div>
+
+</div>
+        <form class="border-t border-slate-200 p-3" id="chatForm">
+          <div class="flex gap-2">
+            <input class="min-w-0 flex-1 rounded-[8px] border border-slate-200 px-3 py-3 text-sm font-semibold outline-none focus:border-emerald-500" id="chatInput" placeholder="Tulis catatan diskusi kelompok...">
+            <button class="btn-primary px-4" type="submit">Kirim</button>
+          </div>
+        </form>
+      </aside>
+    </div>
+  </main>
+
+  <div class="modal-backdrop" id="companyModal">
+    <div class="modal-card" id="modalContent"></div>
+  </div>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <script src="../components/toast.js?v=1783252773"></script>
+  <script src="../components/modal.js?v=1783252773"></script>
+  <script src="../components/companyCard.js?v=1783252773"></script>
+  <script src="../js/city.js?v=1783252773"></script>
+  <script src="../js/ai.js?v=1783252773"></script>
+  <script src="../js/event.js?v=1783252773"></script>
+  <script src="../js/company.js?v=1783252773"></script>
+  <script src="../js/animation.js?v=1783252773"></script>
+  <script src="../js/simulation.js?v=1783252773"></script>
+  <script src="../js/flow.js?v=1783252773"></script>
+  <script src="../js/dashboardPage.js?v=1783252773"></script>
+</body>
+</html>

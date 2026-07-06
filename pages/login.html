@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masuk — CITYNOMICS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/custom.css?v=1783252773">
+</head>
+<body>
+  <header class="topbar">
+    <div class="app-shell flex items-center justify-between py-5">
+      <a href="../index.html"><h1 class="brand-text text-[34px] leading-none">CITY<span>NOMICS</span></h1></a>
+      <a class="btn-secondary" href="../index.html">Kembali ke Beranda</a>
+    </div>
+  </header>
+
+  <main class="app-shell py-14">
+    <div class="mx-auto w-full max-w-[440px]">
+      <div class="panel p-7 md:p-8">
+        <span class="tag">City Investment Council</span>
+        <h2 class="mt-4 text-2xl font-black tracking-[-0.04em]">Portal Tim Investor</h2>
+        <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">Masuk atau daftarkan timmu untuk mulai mengelola Harapan City.</p>
+
+        <div class="action-tabs mt-6" id="authTabs">
+          <button class="action-tab active" data-tab="login">Masuk</button>
+          <button class="action-tab" data-tab="register">Daftar</button>
+        </div>
+
+        <form class="mt-6 grid gap-4" id="loginForm">
+          <label class="block">
+            <span class="text-sm font-black">ID Kelompok</span>
+            <input class="mt-2 w-full rounded-[10px] border border-slate-200 p-3 text-sm font-semibold outline-none focus:border-emerald-500" type="text" id="loginId" placeholder="Contoh: KEL01" required>
+          </label>
+          <label class="block">
+            <span class="text-sm font-black">Kata Sandi</span>
+            <input class="mt-2 w-full rounded-[10px] border border-slate-200 p-3 text-sm font-semibold outline-none focus:border-emerald-500" type="password" id="loginPassword" placeholder="Masukkan kata sandi" required>
+          </label>
+          <button class="btn-primary mt-2 w-full" type="submit">Masuk ke Dashboard</button>
+        </form>
+
+        <form class="mt-6 hidden grid gap-4" id="registerForm">
+          <label class="block">
+            <span class="text-sm font-black">Nama Kelompok</span>
+            <input class="mt-2 w-full rounded-[10px] border border-slate-200 p-3 text-sm font-semibold outline-none focus:border-emerald-500" type="text" id="registerTeam" placeholder="Contoh: Kelompok Investor 1" required>
+          </label>
+          <label class="block">
+            <span class="text-sm font-black">ID Kelompok</span>
+            <input class="mt-2 w-full rounded-[10px] border border-slate-200 p-3 text-sm font-semibold outline-none focus:border-emerald-500" type="text" id="registerId" placeholder="Buat ID Kelompok (Misal: KEL01)" required>
+          </label>
+          <label class="block">
+            <span class="text-sm font-black">Kata Sandi</span>
+            <input class="mt-2 w-full rounded-[10px] border border-slate-200 p-3 text-sm font-semibold outline-none focus:border-emerald-500" type="password" id="registerPassword" placeholder="Buat kata sandi" required>
+          </label>
+          <label class="block">
+            <span class="text-sm font-black">Konfirmasi Kata Sandi</span>
+            <input class="mt-2 w-full rounded-[10px] border border-slate-200 p-3 text-sm font-semibold outline-none focus:border-emerald-500" type="password" id="registerConfirm" placeholder="Ulangi kata sandi" required>
+          </label>
+          <button class="btn-primary mt-2 w-full" type="submit">Daftarkan Tim</button>
+        </form>
+
+        <p class="mt-5 text-center text-xs font-bold text-slate-400" id="authSwitchHint">Belum punya akun? <a class="text-emerald-600" href="#" id="switchToRegister">Daftar di sini</a></p>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <script src="../components/toast.js?v=1783252773"></script>
+  <script src="../js/auth.js?v=1783252773"></script>
+</body>
+</html>

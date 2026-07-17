@@ -1,6 +1,6 @@
 function createCompanyCard(company) {
   return `
-    <article class="company-card">
+    <article class="company-card flex h-full flex-col">
       <div class="flex items-start justify-between gap-3">
         <span class="tag">${company.sector}</span>
         <div class="text-xl font-black text-emerald-600">${company.icon}</div>
@@ -9,7 +9,7 @@ function createCompanyCard(company) {
       <h3 class="mt-4 min-h-[42px] text-sm font-black leading-5">${company.name}</h3>
       <p class="mt-2 min-h-[48px] text-xs font-semibold leading-5 text-slate-500">${company.description}</p>
       <div class="mt-3 text-amber-400">★★★★★</div>
-      <button class="btn-primary mt-4 w-full py-2 text-xs" data-company-id="${company.id}">Lihat Detail</button>
+      <button class="btn-primary mt-auto w-full py-2 text-xs" data-company-id="${company.id}" style="margin-top:16px;">Lihat Detail</button>
     </article>
   `;
 }

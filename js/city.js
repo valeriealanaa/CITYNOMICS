@@ -1,7 +1,12 @@
-const CITY_STORAGE_KEY = "citynomicsCityState";
+const LEGACY_CITY_STORAGE_KEY = "citynomicsCityState";
 const CITY_STATE_VERSION = 2;
 
 const PORTFOLIO_RESERVE = 237500;
+
+function getCityStorageKey() {
+  const activeGroupId = (localStorage.getItem("activeGroupId") || "").trim();
+  return activeGroupId ? `cityState_${activeGroupId}` : LEGACY_CITY_STORAGE_KEY;
+}
 
 const cityState = {
   name: "Harapan City",
@@ -51,23 +56,29 @@ function cityScore() {
 }
 
 function saveCityState() {
-  localStorage.setItem(CITY_STORAGE_KEY, JSON.stringify(Object.assign({ version: CITY_STATE_VERSION }, cityState)));
+  const key = getCityStorageKey();
+  localStorage.setItem(key, JSON.stringify(Object.assign({ version: CITY_STATE_VERSION }, cityState)));
 }
 
 function loadCityState() {
-  const raw = localStorage.getItem(CITY_STORAGE_KEY);
+  const key = getCityStorageKey();
+  const legacyRaw = localStorage.getItem(LEGACY_CITY_STORAGE_KEY);
+  const raw = localStorage.getItem(key) || legacyRaw;
   if (!raw) return false;
 
   try {
     const parsed = JSON.parse(raw);
     if (parsed.version !== CITY_STATE_VERSION) {
-      localStorage.removeItem(CITY_STORAGE_KEY);
+      localStorage.removeItem(key);
       return false;
     }
 
-    // Gunakan Object.assign dengan target variabel cityState yang sudah ada
     Object.assign(cityState, parsed);
-    
+
+    if (!localStorage.getItem(key) && legacyRaw) {
+      localStorage.setItem(key, JSON.stringify(Object.assign({ version: CITY_STATE_VERSION }, cityState)));
+    }
+
     return true;
   } catch (error) {
     return false;
@@ -75,7 +86,9 @@ function loadCityState() {
 }
 
 function resetCityState() {
-  localStorage.removeItem(CITY_STORAGE_KEY);
+  const key = getCityStorageKey();
+  localStorage.removeItem(key);
+  localStorage.removeItem(LEGACY_CITY_STORAGE_KEY);
   cityState.economy = 30;
   cityState.environment = 42;
   cityState.jobs = 28;

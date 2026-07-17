@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>CITYNOMICS — Advanced City Simulator</title>
+<style>
+  :root {
+    --bg:#0b1220; --panel:#0f1b30; --line:#1f3252; --ink:#e7edf7; --muted:#7f93b3;
+    --emerald:#22c58b; --sky1:#7dd3fc; --sky2:#bae6fd;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Segoe UI',system-ui,sans-serif;
+    display:grid; grid-template-columns: 1fr 360px; gap:16px;
+    padding:16px; min-height:100vh;
+  }
+  h1 { font-size:15px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 2px; }
+  h2 { font-size:22px; margin:0 0 14px; font-weight:800; }
+
+  /* Stage & Cuaca */
+  .stage {
+    background:linear-gradient(180deg, var(--sky1), var(--sky2) 45%, #dcfce7 45%, #bbf7d0 100%);
+    border-radius:16px; overflow:hidden; position:relative;
+    border:1px solid var(--line); min-height:560px; transition:background 1.5s ease;
+  }
+  .stage.polluted { background:linear-gradient(180deg,#9ca3af,#d1d5db 45%,#cbd5c0 45%,#a3ad96 100%); }
+  .stage svg { display:block; width:100%; height:auto; position:relative; z-index:2; }
+  
+  .badge { position:absolute; top:14px; left:14px; background:rgba(15,27,48,.85); color:#fff; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:700; z-index:10; }
+  
+  .clouds { position:absolute; top:0; left:0; width:100%; height:170px; z-index:1; pointer-events:none; }
+  .cloud { position:absolute; background:#fff; border-radius:50px; opacity:.85; animation:floatCloud linear infinite; }
+  .cloud::before, .cloud::after { content:''; position:absolute; background:#fff; border-radius:50%; }
+  .polluted .cloud, .polluted .cloud::before, .polluted .cloud::after { background:#94a0ac; }
+  @keyframes floatCloud { from{ transform:translateX(-160px);} to{ transform:translateX(900px);} }
+
+  /* Animasi Kunci (Pop, Smoke, Glow, Spin, Drive) */
+  .building { transform-box:fill-box; transform-origin:50% 100%; animation:popGrow 0.6s cubic-bezier(.2,.9,.3,1.2); }
+  @keyframes popGrow { 0%{ transform:scale(.2,.1); opacity:0;} 100%{ transform:scale(1,1); opacity:1;} }
+  
+  .smoke-puff { animation:puff 2s infinite ease-out; }
+  @keyframes puff { 0%{ transform:translateY(0) scale(1); opacity:.8;} 100%{ transform:translateY(-45px) scale(2.8); opacity:0;} }
+  
+  .mood-bubble { animation:bob 2.5s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-6px);} }
+  
+  .window-glow { animation:glow 3s ease-in-out infinite; }
+  @keyframes glow { 0%,100%{ opacity:.4;} 50%{ opacity:1;} }
+  
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+
+  /* PERBAIKAN: Animasi mobil dipindah ke sini (dalam tag <style>) */
+  @keyframes driveX {
+    0%   { transform: translate(-120px, -60px); opacity: 0; }
+    8%   { opacity: 1; }
+    92%  { opacity: 1; }
+    100% { transform: translate(120px, 60px); opacity: 0; }
+  }
+  @keyframes driveY {
+    0%   { transform: translate(120px, -60px); opacity: 0; }
+    8%   { opacity: 1; }
+    92%  { opacity: 1; }
+    100% { transform: translate(-120px, 60px); opacity: 0; }
+  }
+
+  /* UI Controls */
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:12px; }
+  .panel h3 { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 12px; }
+  .row { margin-bottom:14px; }
+  .row label { display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:var(--muted); margin-bottom:6px; }
+  input[type=range] { width:100%; accent-color:var(--emerald); }
+  .portfolio-item { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; background:#0b1730; margin-bottom:6px; cursor:pointer; font-size:12.5px; font-weight:700; border:1px solid #1f3252;}
+  .portfolio-item input { accent-color:var(--emerald); }
+  button { width:100%; background:var(--emerald); color:#04241a; font-weight:800; border:0; padding:14px; border-radius:10px; cursor:pointer; font-size:13px; margin-top:8px;}
+  button:hover { filter:brightness(1.08); }
+</style>
+
+<style>
+html, body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: transparent;
+}
+body {
+  display: block;
+  padding: 0;
+}
+body > div:first-of-type > div:first-child {
+  display: none;
+}
+body > div:first-of-type {
+  width: 100%;
+}
+body > div:nth-of-type(2) {
+  display: none;
+}
+.stage {
+  width: 100%;
+  min-height: 0;
+  border: 0;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #8bd8ff 0%, #d7f3ff 45%, #dff7dc 45%, #a9d89f 100%);
+}
+.stage svg {
+  width: 100%;
+  height: auto;
+}
+.badge {
+  top: 18px;
+  left: 18px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(8, 47, 36, 0.88);
+  box-shadow: 0 10px 30px rgba(8, 47, 36, 0.18);
+}
+@media (max-width: 720px) {
+  .badge {
+    top: 10px;
+    left: 10px;
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div>
+  <div><h1>Live City Update</h1><h2>Harapan City</h2></div>
+  <div class="stage" id="stage">
+    <div class="badge">Skor Kota: <span id="scoreBadge">—</span>/100</div>
+    <div class="clouds" id="clouds">
+      <div class="cloud" style="width:100px;height:30px;top:40px;left:5%;animation-duration:28s;"></div>
+      <div class="cloud" style="width:140px;height:38px;top:80px;left:-20%;animation-duration:38s;"></div>
+      <div class="cloud" style="width:70px;height:20px;top:20px;left:60%;animation-duration:22s;"></div>
+    </div>
+    <div id="svgContainer"></div>
+  </div>
+</div>
+
+<div>
+  <div class="panel">
+    <h3>Kondisi Makro Kota</h3>
+    <div class="row"><label>Ekonomi (Kepadatan & Perkantoran) <output id="vEconomy"></output></label><input type="range" id="economy" min="0" max="100" value="55"></div>
+    <div class="row"><label>Lingkungan (Pohon & Cuaca) <output id="vEnvironment"></output></label><input type="range" id="environment" min="0" max="100" value="48"></div>
+    <div class="row"><label>Lap. Kerja (Jumlah Pabrik & Asap) <output id="vJobs"></output></label><input type="range" id="jobs" min="0" max="100" value="40"></div>
+    <div class="row"><label>Kebahagiaan (Ekspresi & Fasilitas) <output id="vHappiness"></output></label><input type="range" id="happiness" min="0" max="100" value="45"></div>
+    <div class="row"><label>Infrastruktur (Lampu & Teknologi) <output id="vInfrastructure"></output></label><input type="range" id="infrastructure" min="0" max="100" value="50"></div>
+  </div>
+  <div class="panel">
+    <h3>Status Kepemilikan Portofolio</h3>
+    <label class="portfolio-item"><input type="checkbox" class="pf" value="green-energy" checked> ⚡ Green Energy Indonesia</label>
+    <label class="portfolio-item"><input type="checkbox" class="pf" value="healthcare" checked> ✚ HealthCare Nusantara</label>
+    <label class="portfolio-item"><input type="checkbox" class="pf" value="agro" checked> 🌾 Agro Makmur Sejahtera</label>
+    <label class="portfolio-item"><input type="checkbox" class="pf" value="tech" checked> ⌘ TechNova Indonesia</label>
+    <label class="portfolio-item"><input type="checkbox" class="pf" value="logistics" checked> 🚚 Logistic Cepat Indonesia</label>
+    <label class="portfolio-item"><input type="checkbox" class="pf" value="build" checked> 🏗️ Bangun Negeri Persada</label>
+  </div>
+  <button id="simulateBtn">🎲 Simulasikan Pertumbuhan Bulan Ini</button>
+</div>
+
+<script>
+const TILE_W = 80, TILE_H = 40, ORIGIN_X = 400, ORIGIN_Y = 140, GRID = 7;
+
+function tilePos(gx, gy){ return { x: ORIGIN_X + (gx - gy) * (TILE_W/2), y: ORIGIN_Y + (gx + gy) * (TILE_H/2) }; }
+function isRoadTile(gx, gy){ return gx === 2 || gx === 5 || gy === 2 || gy === 5; }
+function buildingShadow(x,y,size=22){
+  return `
+    <ellipse
+      cx="${x}"
+      cy="${y+8}"
+      rx="${size}"
+      ry="${size/2.2}"
+      fill="rgba(0,0,0,.32)"
+      filter="blur(2px)"
+    />
+  `;
+}
+function companyBadge(x, y, emoji){
+  return `<g class="building">
+    <circle cx="${x}" cy="${y}" r="12" fill="#ffffff" stroke="rgba(0,0,0,.08)" filter="drop-shadow(0 3px 3px rgba(0,0,0,.28))"/>
+    <text x="${x}" y="${y+5}" font-size="14" text-anchor="middle">${emoji}</text>
+  </g>`;
+}
+function cityPlatform(){
+  const cx = ORIGIN_X;
+  const cy = ORIGIN_Y + (GRID-1) * (TILE_H/2) - 5;
+  const rx = GRID * (TILE_W/2) + 20;
+  const ry = rx * 0.36;
+  return `
+    <defs>
+      <radialGradient id="cityShadowGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"  stop-color="#000000" stop-opacity="0.28"/>
+        <stop offset="55%" stop-color="#000000" stop-opacity="0.14"/>
+        <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#cityShadowGrad)"/>
+  `;
+}
+// --- 1. RENDER ALAS & JALAN ---
+function flatTile(gx, gy, color, road=false){
+  const {x,y}=tilePos(gx,gy);
+  const hw=TILE_W/2;
+  const hh=TILE_H/2;
+
+  let svg=`
+  <polygon
+    points="${x},${y-hh}
+            ${x+hw},${y}
+            ${x},${y+hh}
+            ${x-hw},${y}"
+    fill="${color}"
+    stroke="rgba(0,0,0,.04)"
+  />
+
+  <polygon
+    points="${x-hw},${y}
+            ${x},${y+hh}
+            ${x},${y+hh+8}
+            ${x-hw},${y+8}"
+    fill="rgba(0,0,0,.08)"
+  />
+
+  <polygon
+    points="${x},${y+hh}
+            ${x+hw},${y}
+            ${x+hw},${y+8}
+            ${x},${y+hh+8}"
+    fill="rgba(0,0,0,.12)"
+  />
+  `;
+
+  return svg;
+}
+
+// --- 2. KOMPONEN ARSITEKTUR DETIL ---
+function bubbleIcon(x, y, iconType){
+  let bubble = `<path d="M ${x} ${y} L ${x+6} ${y-10} A 14 14 0 1 0 ${x-6} ${y-10} Z" fill="white" filter="drop-shadow(0 3px 2px rgba(0,0,0,.15))"/>`;
+  let icon = "";
+  
+  if(iconType === 'happy') {
+    icon = `<circle cx="${x-3}" cy="${y-21}" r="1.5" fill="#22c55e"/>
+            <circle cx="${x+3}" cy="${y-21}" r="1.5" fill="#22c55e"/>
+            <path d="M ${x-4} ${y-17} Q ${x} ${y-14} ${x+4} ${y-17}" stroke="#22c55e" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+  }
+  else if(iconType === 'neutral') {
+    icon = `<circle cx="${x-3}" cy="${y-21}" r="1.5" fill="#eab308"/>
+            <circle cx="${x+3}" cy="${y-21}" r="1.5" fill="#eab308"/>
+            <line x1="${x-4}" y1="${y-16}" x2="${x+4}" y2="${y-16}" stroke="#eab308" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+  }
+  else if(iconType === 'sad') {
+    icon = `<circle cx="${x-3}" cy="${y-21}" r="1.5" fill="#ef4444"/>
+            <circle cx="${x+3}" cy="${y-21}" r="1.5" fill="#ef4444"/>
+            <path d="M ${x-4} ${y-15} Q ${x} ${y-18} ${x+4} ${y-15}" stroke="#ef4444" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+  }
+  
+  return `<g class="mood-bubble">${bubble}${icon}</g>`;
+}
+
+// Rumah dengan Atap Segitiga
+function houseSVG(gx, gy, isUpgraded){
+  const {x,y:baseY}=tilePos(gx,gy);
+  const y = baseY - 8;
+  const hw = TILE_W/2 - 12, hh = TILE_H/2 - 6, h = 34;
+  const roof = isUpgraded ? "#f97316" : "#ef4444"; 
+  return `
+  ${buildingShadow(x,y,18)}
+<g class="building">
+    <polygon points="${x-hw},${y-h} ${x},${y-h+hh} ${x},${y+hh} ${x-hw},${y}" fill="#f8fafc"/>
+    <polygon points="${x},${y-h+hh} ${x+hw},${y-h} ${x+hw},${y} ${x},${y+hh}" fill="#e2e8f0"/>
+    <polygon points="${x-hw},${y-h} ${x},${y-h+hh} ${x},${y-h-12}" fill="${roof}"/>
+    <polygon points="${x},${y-h+hh} ${x+hw},${y-h} ${x},${y-h-12}" fill="#b91c1c"/>
+    <rect x="${x-6}" y="${y-8}" width="4" height="6" fill="#3b82f6" opacity="0.8"/>
+  </g>`;
+}
+
+// Gedung Perkantoran / Komersil 
+function officeSVG(gx, gy, height, infra){
+  const {x,y:baseY}=tilePos(gx,gy);
+  const y = baseY - 8;
+  const hw = TILE_W/2 - 12, hh = TILE_H/2 - 6;
+  const glass = infra > 50 ? "#7dd3fc" : "#94a3b8";
+  const glow = infra > 60 ? "window-glow" : "";
+  
+  return `
+${buildingShadow(x,y,34)}
+<g class="building">
+    <polygon points="${x-hw},${y-height} ${x},${y-height+hh} ${x},${y+hh} ${x-hw},${y}" fill="#cbd5e1"/>
+    <polygon points="${x},${y-height+hh} ${x+hw},${y-height} ${x+hw},${y} ${x},${y+hh}" fill="#94a3b8"/>
+    <polygon points="${x},${y-height-hh} ${x+hw},${y-height} ${x},${y-height+hh} ${x-hw},${y-height}" fill="#f1f5f9"/>
+    
+    <polygon points="${x-hw+4},${y-height+6} ${x-4},${y-height+hh+1} ${x-4},${y+hh-6} ${x-hw+4},${y-1}" fill="${glass}" class="${glow}"/>
+    <line x1="${x-hw+4}" y1="${y-height/2+2}" x2="${x-4}" y2="${y-height/2+hh-3}" stroke="#cbd5e1" stroke-width="2"/>
+    
+    <polygon points="${x+4},${y-height+hh+1} ${x+hw-4},${y-height+6} ${x+hw-4},${y-1} ${x+4},${y+hh-6}" fill="#0ea5e9" opacity="0.8"/>
+  </g>`;
+}
+
+// Pabrik dengan Cerobong Asap
+function factorySVG(gx, gy, jobs, hasMarker=false){
+  const {x,y:baseY}=tilePos(gx,gy);
+  const y = baseY - 8;
+  const hw = TILE_W/2 - 12, hh = TILE_H/2 - 6, h = 40;
+  
+  let base = `
+${buildingShadow(x,y,32)}
+<g class="building">
+    <polygon points="${x-hw},${y-h} ${x},${y-h+hh} ${x},${y+hh} ${x-hw},${y}" fill="#6b7280"/>
+    <polygon points="${x},${y-h+hh} ${x+hw},${y-h} ${x+hw},${y} ${x},${y+hh}" fill="#4b5563"/>
+    <polygon points="${x},${y-h-hh} ${x+hw},${y-h} ${x},${y-h+hh} ${x-hw},${y-h}" fill="#9ca3af"/>
+
+    <polygon points="${x-10},${y-h-10} ${x-4},${y-h-7} ${x-4},${y-h-25} ${x-10},${y-h-28}" fill="#475569"/>
+    <polygon points="${x-4},${y-h-7} ${x+2},${y-h-10} ${x+2},${y-h-28} ${x-4},${y-h-25}" fill="#334155"/>
+    <polygon points="${x-4},${y-h-25} ${x+2},${y-h-28} ${x-4},${y-h-31} ${x-10},${y-h-28}" fill="#1e293b"/>
+</g>
+`;
+
+  let smoke = "";
+  const puffs = Math.floor(jobs / 20); 
+  for(let i=0; i<puffs; i++){
+    smoke += `<circle class="smoke-puff" cx="${x-4}" cy="${y-h-30}" r="6" style="animation-delay:${i*0.5}s" fill="rgba(100,110,120,0.8)"/>`;
+  }
+  
+  if(hasMarker){
+    base += `
+        <line
+            x1="${x+30}"
+            y1="${y-40}"
+            x2="${x+30}"
+            y2="${y-100}"
+            stroke="#facc15"
+            stroke-width="4"
+        />
+
+        <line
+            x1="${x+30}"
+            y1="${y-100}"
+            x2="${x+70}"
+            y2="${y-100}"
+            stroke="#facc15"
+            stroke-width="4"
+        />
+
+        <line
+            x1="${x+55}"
+            y1="${y-100}"
+            x2="${x+55}"
+            y2="${y-75}"
+            stroke="#facc15"
+            stroke-width="2"
+        />
+
+        <rect
+            x="${x+50}"
+            y="${y-75}"
+            width="10"
+            height="8"
+            fill="#f59e0b"
+        />
+    ` + companyBadge(x, y-h-20, '🏗️');
+}
+
+  return base + smoke;
+}
+
+// --- 3. ANCHOR KHUSUS PERUSAHAAN ---
+function techNovaAnchor(gx, gy, infra){
+  const {x,y} = tilePos(gx,gy), h=90;
+  return officeSVG(gx, gy, h, infra) + 
+    `<polyline points="${x-20},${y-h+10} ${x},${y-h+20} ${x},${y-h+40}" stroke="#38bdf8" stroke-width="2" fill="none" class="window-glow"/>` 
+    +
+`
+<rect
+x="${x-14}"
+y="${y-h+12}"
+width="28"
+height="10"
+rx="2"
+fill="#0ea5e9"
+/>
+
+<text
+x="${x}"
+y="${y-h+20}"
+font-size="7"
+font-weight="800"
+text-anchor="middle"
+fill="white"
+>
+TN
+</text>
+`
++ companyBadge(x, y-h-12, '⌘')
+}
+
+function healthCareAnchor(gx, gy){
+  const {x,y:baseY}=tilePos(gx,gy);
+  const y = baseY - 8;
+  const hw = TILE_W/2 - 12, hh = TILE_H/2 - 6, h = 36;
+  return buildingShadow(x,y,28) + `<g class="building">
+    <polygon points="${x-hw},${y-h} ${x},${y-h+hh} ${x},${y+hh} ${x-hw},${y}" fill="#e2e8f0"/>
+    <polygon points="${x},${y-h+hh} ${x+hw},${y-h} ${x+hw},${y} ${x},${y+hh}" fill="#cbd5e1"/>
+    <polygon points="${x},${y-h-hh} ${x+hw},${y-h} ${x},${y-h+hh} ${x-hw},${y-h}" fill="#f8fafc"/>
+    <path d="M ${x-20} ${y-h+20} L ${x-10} ${y-h+25} L ${x-10} ${y-h+35} L ${x-20} ${y-h+30} Z" fill="#ef4444"/>
+  </g>` + companyBadge(x, y-h-8, '✚');
+}
+
+function agroAnchor(gx, gy){
+  const {x,y:baseY}=tilePos(gx,gy);
+  const y = baseY - 8;
+  const hw = TILE_W/2 - 12, hh = TILE_H/2 - 6, h = 24;
+  return buildingShadow(x,y,26) + `<g class="building">
+    <polygon points="${x-hw},${y-h} ${x},${y-h+hh} ${x},${y+hh} ${x-hw},${y}" fill="#86efac"/>
+    <polygon points="${x},${y-h+hh} ${x+hw},${y-h} ${x+hw},${y} ${x},${y+hh}" fill="#4ade80"/>
+    <polygon points="${x},${y-h-hh} ${x+hw},${y-h} ${x},${y-h+hh} ${x-hw},${y-h}" fill="rgba(255,255,255,0.6)" stroke="#22c55e" stroke-width="1"/>
+  <polygon
+points="${x-30},${y}
+        ${x-21},${y-8}
+        ${x-12},${y}
+        ${x-21},${y+2}"
+fill="rgba(255,255,255,.45)"
+stroke="#22c55e"
+stroke-width="1"
+/>
+
+<polygon
+points="${x+12},${y}
+        ${x+21},${y-8}
+        ${x+30},${y}
+        ${x+21},${y+2}"
+fill="rgba(255,255,255,.45)"
+stroke="#22c55e"
+stroke-width="1"
+/>
+
+<polygon
+points="${x-9},${y+10}
+        ${x},${y+2}
+        ${x+9},${y+10}
+        ${x},${y+12}"
+fill="rgba(255,255,255,.45)"
+stroke="#22c55e"
+stroke-width="1"
+/>
+  </g>` + companyBadge(x, y-h-10, '🌾');
+}
+
+function energyAnchor(gx,gy){
+    const {x,y:baseY} = tilePos(gx,gy);
+    const y = baseY - 10;
+
+    function turbine(offsetX){
+        return `
+        <g class="building">
+            <line
+                x1="${x+offsetX}"
+                y1="${y}"
+                x2="${x+offsetX}"
+                y2="${y-60}"
+                stroke="#e2e8f0"
+                stroke-width="4"
+            />
+
+            <g style="
+                transform-origin:${x+offsetX}px ${y-60}px;
+                animation:spin 3s linear infinite;
+            ">
+                <polygon points="${x+offsetX-2},${y-60}
+                                 ${x+offsetX+2},${y-60}
+                                 ${x+offsetX},${y-85}"
+                         fill="#f8fafc"/>
+
+                <polygon points="${x+offsetX-2},${y-60}
+                                 ${x+offsetX+2},${y-60}
+                                 ${x+offsetX+22},${y-48}"
+                         fill="#f8fafc"/>
+
+                <polygon points="${x+offsetX-2},${y-60}
+                                 ${x+offsetX+2},${y-60}
+                                 ${x+offsetX-22},${y-48}"
+                         fill="#f8fafc"/>
+            </g>
+
+            <circle
+                cx="${x+offsetX}"
+                cy="${y-60}"
+                r="4"
+                fill="#cbd5e1"
+            />
+        </g>
+        `;
+    }
+
+    return (
+        buildingShadow(x, baseY, 16) +
+        turbine(-25) +
+        turbine(0) +
+        turbine(25) +
+        companyBadge(x, y-72, '⚡')
+    );
+}
+
+
+
+// --- LOGISTIC CEPAT INDONESIA: gudang + armada truk berfase ---
+function logisticsDepot(gx, gy){
+  const {x,y:baseY}=tilePos(gx,gy);
+  const y = baseY - 8;
+  const hw = TILE_W/2 - 10, hh = TILE_H/2 - 4, h = 30;
+  return buildingShadow(x,y,30) + `<g class="building">
+    <polygon points="${x-hw},${y-h} ${x},${y-h+hh} ${x},${y+hh} ${x-hw},${y}" fill="#f97316"/>
+    <polygon points="${x},${y-h+hh} ${x+hw},${y-h} ${x+hw},${y} ${x},${y+hh}" fill="#c2410c"/>
+    <polygon points="${x},${y-h-hh} ${x+hw},${y-h} ${x},${y-h+hh} ${x-hw},${y-h}" fill="#fdba74"/>
+    <polygon points="${x-hw+6},${y-hh+2} ${x-4},${y-2} ${x-4},${y+hh-4} ${x-hw+6},${y+hh-8}" fill="#7c2d12" opacity=".55"/>
+  </g>` + companyBadge(x, y-h-8, '🚚');
+}
+
+// truk isometrik kecil, mengikuti gaya trafficSVG yang sudah ada
+function truckShape(x, y, bodyColor="#f97316", capColor="#c2410c"){
+  return `
+    <ellipse cx="${x-4}" cy="${y+7}" rx="9" ry="3" fill="rgba(0,0,0,.35)" filter="blur(1px)"/>
+    <polygon points="${x-9},${y-6} ${x},${y-3} ${x},${y+5} ${x-9},${y+2}" fill="${bodyColor}"/>
+    <polygon points="${x},${y-3} ${x+9},${y-6} ${x+9},${y+2} ${x},${y+5}" fill="${capColor}"/>
+    <polygon points="${x},${y-10} ${x+9},${y-6} ${x},${y-3} ${x-9},${y-6}" fill="#fed7aa"/>
+  `;
+}
+
+// fase armada: 0 = belum ada truk, 1 = 1 truk (baru mulai beroperasi), 2 = armada bertambah (2-3 truk)
+function logisticsFleet(phase){
+  if(phase <= 0) return "";
+  const p1 = tilePos(3,2); // jalan horizontal gy=2
+  const p2 = tilePos(5,3); // jalan vertikal gx=5
+  const p3 = tilePos(3,5); // jalan horizontal gy=5
+  let fleet = `<g style="animation: driveX 7s linear infinite;">${truckShape(p1.x, p1.y)}</g>`;
+  if(phase >= 2){
+    fleet += `<g style="animation: driveY 6.5s linear infinite; animation-delay: 1.2s;">${truckShape(p2.x, p2.y, "#3b82f6", "#1d4ed8")}</g>`;
+    fleet += `<g style="animation: driveX 8.5s linear infinite; animation-delay: 2.4s;">${truckShape(p3.x, p3.y)}</g>`;
+  }
+  return fleet;
+}
+
+// --- 4. DEKORASI ---
+function treesSVG(gx, gy, env){
+  const {x,y} = tilePos(gx,gy);
+  let tr = "";
+  const count = env > 70 ? 3 : (env > 30 ? 1 : 0);
+  
+  if (count > 0) {
+    tr += `<polygon points="${x-14},${y} ${x},${y+7} ${x+14},${y} ${x},${y-7}" fill="rgba(34, 197, 94, 0.15)"/>`;
+  }
+  
+  for(let i=0; i<count; i++){
+    let ox = i==1 ? -14 : (i==2 ? 14 : 0), oy = i==1 ? -4 : (i==2 ? -4 : 0);
+    let delay = (i * 0.5).toFixed(1);
+    tr += `<g class="building" style="animation: bob 3s ease-in-out infinite; animation-delay: ${delay}s">
+      <circle cx="${x+ox}" cy="${y-10+oy}" r="9" fill="#16a34a"/>
+      <polygon points="${x+ox-2},${y-3+oy} ${x+ox+2},${y-3+oy} ${x+ox},${y+5+oy}" fill="#78350f"/>
+    </g>`;
+  }
+  return tr;
+}
+
+function lampSVG(gx, gy, on){
+  const {x,y} = tilePos(gx,gy);
+  return `<line x1="${x}" y1="${y-18}" x2="${x}" y2="${y}" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="${x}" cy="${y-18}" r="3" fill="${on?'#fde047':'#475569'}" class="${on?'window-glow':''}"/>`;
+}
+function trafficLightSVG(gx,gy){
+    const {x,y}=tilePos(gx,gy);
+
+    return `
+    <g class="building">
+        <line
+            x1="${x+18}"
+            y1="${y}"
+            x2="${x+18}"
+            y2="${y-18}"
+            stroke="#64748b"
+            stroke-width="3"
+        />
+
+        <rect
+            x="${x+14}"
+            y="${y-28}"
+            width="8"
+            height="12"
+            rx="2"
+            fill="#1e293b"
+        />
+
+        <circle cx="${x+18}" cy="${y-25}" r="2" fill="#ef4444"/>
+        <circle cx="${x+18}" cy="${y-21}" r="2" fill="#facc15"/>
+        <circle cx="${x+18}" cy="${y-17}" r="2" fill="#22c55e"/>
+    </g>
+    `;
+}
+function carShape(x, y, bodyColor, capColor, glassColor){
+  return `
+    <ellipse cx="${x-3}" cy="${y+7}" rx="7" ry="2.5" fill="rgba(0,0,0,.35)" filter="blur(1px)"/>
+    <polygon points="${x-7},${y-5} ${x},${y-2} ${x},${y+5} ${x-7},${y+2}" fill="${bodyColor}"/>
+    <polygon points="${x},${y-2} ${x+7},${y-5} ${x+7},${y+2} ${x},${y+5}" fill="${capColor}"/>
+    <polygon points="${x},${y-9} ${x+7},${y-5} ${x},${y-2} ${x-7},${y-5}" fill="${glassColor}"/>
+  `;
+}
+function trafficSVG(stats){
+  const {economy, jobs} = stats;
+  const activity = (economy + jobs) / 2;
+  const hPos = tilePos(3, 2); // titik tengah jalan horizontal (gy=2), gx 0..6
+  const vPos = tilePos(2, 3); // titik tengah jalan vertikal (gx=2), gy 0..6
+  
+  let traffic = `
+    <g style="animation: driveX 8s linear infinite;">
+      ${carShape(hPos.x, hPos.y, "#ef4444", "#b91c1c", "#fca5a5")}
+    </g>
+    <g style="animation: driveY 6s linear infinite; animation-delay: 2s;">
+      ${carShape(vPos.x, vPos.y, "#3b82f6", "#1d4ed8", "#93c5fd")}
+    </g>
+  `;
+  
+  if (activity > 50) {
+    traffic += `
+      <g style="animation: driveX 7.5s linear infinite; animation-delay: 3.5s;">
+        ${carShape(hPos.x, hPos.y, "#eab308", "#ca8a04", "#fef08a")}
+      </g>
+    `;
+  }
+  
+  if (activity > 75) {
+    traffic += `
+      <g style="animation: driveY 6.5s linear infinite; animation-delay: 4.5s;">
+        ${carShape(vPos.x, vPos.y, "#22c55e", "#16a34a", "#bbf7d0")}
+      </g>
+    `;
+  }
+  
+  return traffic;
+}
+
+// --- 5. LOGIKA PENYEBARAN KOTA ---
+const ZONES = {
+  anchor: { "4,4":"tech", "1,3":"healthcare", "3,6":"build", "3,1":"green-energy", "6,3":"agro", "4,1":"logistics" },
+  resCom: [[0,0],[1,0],[0,1],[1,1],[3,0],[4,0],[0,3],[0,4],[1,4],[6,0],[6,1]], 
+  indus:  [[0,6],[1,6],[4,6],[6,6],[6,4]] 
+};
+
+const PLOT_ORDER = [];
+for(let gy=0; gy<GRID; gy++) for(let gx=0; gx<GRID; gx++) PLOT_ORDER.push([gx,gy]);
+PLOT_ORDER.sort((a,b) => (a[0]+a[1]) - (b[0]+b[1])); 
+
+function renderCity(stats, portfolio){
+  const { economy, environment, jobs, happiness, infrastructure } = stats;
+  document.getElementById("scoreBadge").textContent = Math.round((economy+environment+jobs+happiness+infrastructure)/5);
+
+  const stage = document.getElementById("stage");
+  stage.classList.toggle("polluted", environment < 35);
+
+  const maxEcoPlots = Math.floor((economy / 100) * ZONES.resCom.length);
+  const maxIndPlots = Math.floor((jobs / 100) * ZONES.indus.length);
+  
+  const activeEco = ZONES.resCom.slice(0, maxEcoPlots).map(p=>p.join(','));
+  const activeInd = ZONES.indus.slice(0, maxIndPlots).map(p=>p.join(','));
+
+  let svg = `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">`;
+  svg += cityPlatform();
+  let objects=[];
+
+  PLOT_ORDER.forEach(([gx,gy]) => {
+    const key = `${gx},${gy}`;
+    const isRoad = isRoadTile(gx, gy);
+    
+    if(isRoad) svg += flatTile(gx, gy, "#475569", true);
+    else svg += flatTile(gx, gy, environment < 30 ? "#d6d3d1" : "#86efac");
+
+    if(!isRoad) {
+      if(ZONES.anchor[key]) {
+        const id = ZONES.anchor[key];
+        if(!portfolio.includes(id)) {
+          objects.push({y:tilePos(gx,gy).y, svg:treesSVG(gx,gy, environment)});
+        } else {
+          if(id==='tech') objects.push({y:tilePos(gx,gy).y, svg:techNovaAnchor(gx,gy, infrastructure)});
+          if(id==='healthcare') objects.push({y:tilePos(gx,gy).y, svg:healthCareAnchor(gx,gy)});
+          if(id==='agro') objects.push({y:tilePos(gx,gy).y, svg:agroAnchor(gx,gy)});
+          if(id==='green-energy') objects.push({y:tilePos(gx,gy).y, svg:energyAnchor(gx,gy)});
+          if(id==='build') objects.push({y:tilePos(gx,gy).y, svg:factorySVG(gx, gy, jobs, true)});
+          if(id==='logistics') objects.push({y:tilePos(gx,gy).y, svg:logisticsDepot(gx,gy)});
+        }
+      }
+      else if(activeInd.includes(key)) {
+        objects.push({y:tilePos(gx,gy).y, svg:factorySVG(gx, gy, jobs)});
+      }
+      else if(activeEco.includes(key)) {
+        if(economy > 70 && (gx+gy)%2===0) objects.push({y:tilePos(gx,gy).y, svg:officeSVG(gx, gy, 45, infrastructure)});
+        else objects.push({y:tilePos(gx,gy).y, svg:houseSVG(gx, gy, economy > 50)});
+      }
+      else {
+        objects.push({y:tilePos(gx,gy).y, svg:treesSVG(gx, gy, environment)});
+      }
+    } else {
+      if((gx%2===0 || gy%2===0)) objects.push({y:tilePos(gx,gy).y, svg:lampSVG(gx, gy, infrastructure > 40)});
+    }
+  });
+
+  objects.sort((a,b)=>a.y-b.y);
+  svg += objects.map(o=>o.svg).join("");
+
+  const moodIcon = happiness >= 60 ? 'happy' : (happiness <= 35 ? 'sad' : 'neutral');
+  let bubblePos = tilePos(1,1);
+  if (activeEco.length > 0) {
+    let [gx, gy] = activeEco[0].split(',');
+    bubblePos = tilePos(Number(gx), Number(gy));
+  }
+  svg += bubbleIcon(bubblePos.x, bubblePos.y - 35, moodIcon);
+
+  if(economy > 30) svg += trafficSVG(stats);
+
+  // fase armada Logistic Cepat Indonesia: gaada -> ada -> nambah
+  if(portfolio.includes('logistics')){
+    const activity = (economy + jobs) / 2;
+    const phase = activity < 35 ? 0 : (activity < 70 ? 1 : 2);
+    svg += logisticsFleet(phase);
+  }
+
+  svg += `</svg>`;
+  document.getElementById("svgContainer").innerHTML = svg;
+}
+
+// --- KONTROL UI DEMO ---
+const ids = ["economy","environment","jobs","happiness","infrastructure"];
+const stats = {economy:55, environment:48, jobs:40, happiness:45, infrastructure:50};
+
+function currentPortfolio(){ return [...document.querySelectorAll(".pf:checked")].map(el=>el.value); }
+function syncUI(){
+  ids.forEach(id=>{
+    document.getElementById("v"+id.charAt(0).toUpperCase()+id.slice(1)).textContent = stats[id];
+    document.getElementById(id).value = stats[id];
+  });
+  renderCity(stats, currentPortfolio());
+}
+
+ids.forEach(id => document.getElementById(id).addEventListener("input", e=>{ stats[id]=parseInt(e.target.value,10); syncUI(); }));
+document.querySelectorAll(".pf").forEach(el => el.addEventListener("change", syncUI));
+
+document.getElementById("simulateBtn").addEventListener("click", ()=>{
+  ids.forEach(id=> stats[id] = Math.max(0, Math.min(100, stats[id] + Math.round((Math.random()-0.3)*25))));
+  syncUI();
+});
+syncUI();
+
+window.addEventListener("message", (event) => {
+  const payload = event.data;
+
+  if (!payload || payload.type !== "CITYNOMICS_SMART_CITY_UPDATE") {
+    return;
+  }
+
+  const incomingStats = payload.stats || {};
+
+  ids.forEach((id) => {
+    if (Number.isFinite(Number(incomingStats[id]))) {
+      stats[id] = Math.max(0, Math.min(100, Number(incomingStats[id])));
+    }
+  });
+
+  const portfolio = Array.isArray(payload.portfolio) ? payload.portfolio : [];
+  const normalizedPortfolio = portfolio.map((id) => id === "logistic" ? "logistics" : id);
+
+  document.querySelectorAll(".pf").forEach((checkbox) => {
+    checkbox.checked = normalizedPortfolio.includes(checkbox.value);
+  });
+
+  syncUI();
+});
+</script>
+</body>
+</html>

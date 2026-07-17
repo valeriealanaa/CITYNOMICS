@@ -1,4 +1,4 @@
-﻿function setText(id, value) {
+function setText(id, value) {
   const element = document.getElementById(id);
   if (element) {
     element.textContent = value;
@@ -16,16 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  if (reportContent) {
-    reportContent.classList.remove("hidden");
-  }
+  if (reportContent) reportContent.classList.remove("hidden");
 
   const current = {
-    economy: Number(cityState.economy || 0),
-    environment: Number(cityState.environment || 0),
-    jobs: Number(cityState.jobs || 0),
-    happiness: Number(cityState.happiness || 0),
-    infrastructure: Number(cityState.infrastructure || 0)
+    economy: cityState.economy,
+    environment: cityState.environment,
+    jobs: cityState.jobs,
+    happiness: cityState.happiness,
+    infrastructure: cityState.infrastructure
   };
 
   const earningRate = Number(cityState.earningRate || 0);
@@ -51,12 +49,12 @@ document.addEventListener("DOMContentLoaded", () => {
   setText("beforeStats", "🏚️ 🌫️ 👷⬇️ 🙁");
   setText("afterStats", describeCityEmoji(current));
   setText("finalScore", `${finalScore} / 100`);
-  setText("availableFund", formatRupiah(Number(cityState.availableFund || 0)));
-  setText("investedFund", formatRupiah(Number(cityState.investedFund || 0)));
-  setText("totalAsset", formatRupiah(Number(cityState.totalAsset || 0)));
+  setText("availableFund", formatRupiah(cityState.availableFund));
+  setText("investedFund", formatRupiah(cityState.investedFund));
+  setText("totalAsset", formatRupiah(cityState.totalAsset));
   setText("earningRate", `${earningRate.toFixed(2)}%`);
   setText("returnVal", `${earningRate.toFixed(2)}%`);
-  setText("cityRank", cityState.rank || "-");
+  setText("cityRank", cityState.rank);
   setText("buyCount", `${totalBuy}`);
   setText("sellCount", `${totalSell}`);
   setText("holdCount", `${totalHold}`);
@@ -90,14 +88,12 @@ document.addEventListener("DOMContentLoaded", () => {
       ? journeyEntries.map((item) => `
           <div class="mb-3 rounded-[10px] bg-white p-4 shadow-sm">
             <div class="flex items-center justify-between gap-3">
-              <div>
-                <strong>${item.action || "DECISION"} ${item.company || ""}${item.percentage ? ` (${item.percentage}%)` : ""}</strong>
-                <p class="mt-2 text-sm font-semibold text-slate-600">Investasi: ${formatRupiah(Number(item.amount || 0))}</p>
-                ${item.action === "SELL" ? `<p class="mt-1 text-sm font-semibold text-emerald-600">Profit: ${formatRupiah(Number(item.profit || 0))}</p>` : ""}
-              </div>
-              <span class="text-xs font-black text-emerald-600">Bulan ${item.month || "-"}</span>
+              <strong>${item.action} ${item.company}${item.percentage ? ` (${item.percentage}%)` : ""}</strong>
+              <span class="text-xs font-black text-emerald-600">Bulan ${item.month}</span>
             </div>
             <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">${item.reason || "Tidak ada alasan tercatat."}</p>
+            <p class="mt-2 text-sm font-semibold text-slate-600">Investasi: ${formatRupiah(item.amount || 0)}</p>
+            ${item.action === "SELL" ? `<p class="mt-1 text-sm font-semibold text-emerald-600">Profit: ${formatRupiah(item.profit || 0)}</p>` : ""}
             ${item.note ? `<p class="mt-2 text-xs font-bold text-emerald-700">Catatan AI: ${item.note}</p>` : ""}
           </div>
         `).join("")

@@ -278,14 +278,6 @@ showTransactionResult({
     );
 
     // =========================
-    // BULAN BERJALAN
-    // =========================
-    cityState.month = Math.min(
-        12,
-        cityState.month + 1
-    );
-
-    // =========================
     // UPDATE
     // =========================
     // UPDATE

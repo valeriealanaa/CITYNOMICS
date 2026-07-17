@@ -6,31 +6,41 @@
   <title>Masuk — CITYNOMICS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="../css/custom.css?v=1783252773">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'] },
+          fontWeight: { black: '600', extrabold: '600', bold: '500', semibold: '500', medium: '450' }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="../css/custom.css?v=3">
 </head>
-<body>
+<body class="auth-bg">
   <header class="topbar">
     <div class="app-shell flex items-center justify-between py-5">
-      <a href="../index.html"><h1 class="brand-text text-[34px] leading-none">CITY<span>NOMICS</span></h1></a>
-      <a class="btn-secondary" href="../index.html">Kembali ke Beranda</a>
+      <a href="../index.html"><h1 class="brand-text text-[26px] leading-none">CITY<span>NOMICS</span></h1></a>
+      <a class="btn-secondary" href="../index.html">← Kembali</a>
     </div>
   </header>
 
-  <main class="app-shell py-14">
-    <div class="mx-auto w-full max-w-[440px]">
-      <div class="panel p-7 md:p-8">
+  <main class="app-shell py-8 md:py-10">
+    <div class="mx-auto w-full max-w-[430px]">
+      <div class="panel p-6 md:p-7">
         <span class="tag">City Investment Council</span>
         <h2 class="mt-4 text-2xl font-black tracking-[-0.04em]">Portal Tim Investor</h2>
         <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">Masuk atau daftarkan timmu untuk mulai mengelola Harapan City.</p>
 
-        <div class="action-tabs mt-6" id="authTabs">
+        <div class="action-tabs mt-5" id="authTabs">
           <button class="action-tab active" data-tab="login">Masuk</button>
           <button class="action-tab" data-tab="register">Daftar</button>
         </div>
 
-        <form class="mt-6 grid gap-4" id="loginForm">
+        <form class="mt-5 grid gap-3" id="loginForm">
           <label class="block">
             <span class="text-sm font-black">ID Kelompok</span>
             <input class="mt-2 w-full rounded-[10px] border border-slate-200 p-3 text-sm font-semibold outline-none focus:border-emerald-500" type="text" id="loginId" placeholder="Contoh: KEL01" required>
@@ -42,7 +52,7 @@
           <button class="btn-primary mt-2 w-full" type="submit">Masuk ke Dashboard</button>
         </form>
 
-        <form class="mt-6 hidden grid gap-4" id="registerForm">
+        <form class="mt-5 hidden grid gap-3" id="registerForm">
           <label class="block">
             <span class="text-sm font-black">Nama Kelompok</span>
             <input class="mt-2 w-full rounded-[10px] border border-slate-200 p-3 text-sm font-semibold outline-none focus:border-emerald-500" type="text" id="registerTeam" placeholder="Contoh: Kelompok Investor 1" required>
@@ -62,7 +72,7 @@
           <button class="btn-primary mt-2 w-full" type="submit">Daftarkan Tim</button>
         </form>
 
-        <p class="mt-5 text-center text-xs font-bold text-slate-400" id="authSwitchHint">Belum punya akun? <a class="text-emerald-600" href="#" id="switchToRegister">Daftar di sini</a></p>
+        <p class="mt-4 text-center text-xs font-bold text-slate-400" id="authSwitchHint">Belum punya akun? <a class="text-emerald-600" href="#" id="switchToRegister">Daftar di sini</a></p>
       </div>
     </div>
   </main>

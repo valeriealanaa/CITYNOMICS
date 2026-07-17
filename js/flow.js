@@ -246,6 +246,24 @@ function renderExplorationStage() {
   `;
 }
 
+function buildJourneySummary(limit = 4) {
+  const history = [...(cityState.journey || [])].reverse().slice(0, limit);
+
+  if (!history.length) {
+    return `<p class="text-sm font-semibold text-slate-500">Belum ada keputusan. Keputusanmu akan muncul di sini setelah ada aksi BUY, SELL, atau HOLD.</p>`;
+  }
+
+  return history.map((item) => `
+    <div class="rounded-[10px] border border-slate-200 bg-white p-3">
+      <div class="flex items-center justify-between gap-2">
+        <p class="text-sm font-black text-slate-800">${item.action} ${item.company}${item.percentage ? ` (${item.percentage}%)` : ""}</p>
+        <span class="text-[11px] font-black uppercase text-emerald-600">Bulan ${item.month}</span>
+      </div>
+      <p class="mt-1 text-xs font-semibold leading-5 text-slate-500">${item.reason || "Tidak ada alasan tercatat."}</p>
+    </div>
+  `).join("");
+}
+
 function renderPortfolioStage() {
   const rows = companiesData.map((company) => createPortfolioRow(company, flowState.portfolioDraft[company.id])).join("");
 
@@ -255,6 +273,10 @@ function renderPortfolioStage() {
     <div class="mt-5 panel-soft p-4 flex items-center justify-between">
       <span class="text-sm font-black">Total Alokasi</span>
       <span class="text-xl font-black" id="portfolioTotal">0%</span>
+    </div>
+    <div class="mt-5 panel-soft p-4">
+      <p class="text-xs font-black uppercase text-emerald-600">Riwayat Keputusan</p>
+      <div class="mt-3 grid gap-2">${buildJourneySummary(3)}</div>
     </div>
     <div class="mt-6 flex items-center justify-between">
       ${backButtonHtml()}
@@ -346,6 +368,10 @@ function renderDecisionStage() {
     >${currentReason}</textarea>
 </div>
     ` : `<p class="mt-5 text-sm font-bold text-slate-400">Pilih salah satu perusahaan di atas untuk mulai menentukan keputusan.</p>`}
+    <div class="mt-5 panel-soft p-4">
+      <p class="text-xs font-black uppercase text-emerald-600">Riwayat Keputusan</p>
+      <div class="mt-3 grid gap-2">${buildJourneySummary(4)}</div>
+    </div>
     <div class="mt-6 flex items-center justify-between">
       ${backButtonHtml()}
       <button class="btn-primary" id="decisionConfirmBtn" ${activeCompany ? "" : "disabled"}>Konfirmasi Keputusan</button>
@@ -395,31 +421,50 @@ function renderCityUpdateStage() {
 
   const rowsHtml = rows.map(([label, from, to]) => {
     const delta = to - from;
-    const arrow = delta > 0 ? "📈" : delta < 0 ? "📉" : "➖";
+    const stateClass = delta > 0 ? "is-positive" : delta < 0 ? "is-negative" : "is-neutral";
+    const symbol = delta > 0 ? "↗" : delta < 0 ? "↘" : "—";
+
     return `
-      <div class="stat-line">
-        <span>${label}</span>
-        <div class="progress"><span style="width: ${to}%"></span></div>
-        <strong>${arrow} ${delta > 0 ? "+" : ""}${delta}</strong>
+      <div class="smart-city-stat-row ${stateClass}">
+        <div class="smart-city-stat-label">${label}</div>
+        <div class="smart-city-stat-track">
+          <span style="width: ${Math.max(0, Math.min(100, to))}%"></span>
+        </div>
+        <div class="smart-city-stat-delta">
+          <span>${symbol}</span>
+          <strong>${delta > 0 ? "+" : ""}${delta}</strong>
+        </div>
       </div>
     `;
   }).join("");
 
   return `
     ${stageHeader(8, "Smart City Update", "Bukan angka semata. Inilah cara kota kalian benar-benar berubah setelah keputusan diambil.")}
-    <div class="hero-card city-update-hero p-5" id="cityUpdateIllustration">
-      <div class="panel-soft relative z-10 w-full max-w-[320px] bg-white/92 p-5">
-        <p class="text-xs font-black uppercase text-slate-500">Perubahan Bulan ${cityState.month}</p>
-        <div class="stat-card mt-4">${rowsHtml}</div>
-      </div>
-      <div class="city-illustration">
-        <div class="buildings">
-          <div class="building"></div><div class="building"></div><div class="building"></div><div class="building"></div><div class="building"></div>
+    <div class="smart-city-output" id="cityUpdateIllustration">
+      <div class="smart-city-output-head">
+        <div>
+          <p class="smart-city-eyebrow">Live City Visualization</p>
+          <h3>${cityState.name}</h3>
         </div>
-        <div class="tree tree-left"></div>
-        <div class="tree tree-right"></div>
-        <div class="city-road"></div>
-        <div class="water"></div>
+        <div class="smart-city-score-pill">
+          <span>Skor Kota</span>
+          <strong>${cityScore()}/100</strong>
+        </div>
+      </div>
+
+      <div class="smart-city-visual-shell">
+        <iframe
+          id="smartCityVisualFrame"
+          class="smart-city-visual-frame"
+          src="smart-city-visual.html"
+          title="Visualisasi perubahan Harapan City"
+          loading="eager"
+        ></iframe>
+
+        <div class="smart-city-change-card">
+          <p class="smart-city-change-title">Perubahan Bulan ${cityState.month}</p>
+          <div class="smart-city-stat-list">${rowsHtml}</div>
+        </div>
       </div>
     </div>
     <div class="mt-6 flex items-center justify-between">
@@ -671,8 +716,33 @@ Silakan sesuaikan strategi investasimu.`
 
   if (flowState.stage === "cityupdate") {
     const illustration = document.getElementById("cityUpdateIllustration");
+    const frame = document.getElementById("smartCityVisualFrame");
+
     if (illustration) {
       pulseElement(illustration);
+    }
+
+    const sendSmartCityState = () => {
+      if (!frame || !frame.contentWindow) {
+        return;
+      }
+
+      frame.contentWindow.postMessage({
+        type: "CITYNOMICS_SMART_CITY_UPDATE",
+        stats: {
+          economy: cityState.economy,
+          environment: cityState.environment,
+          jobs: cityState.jobs,
+          happiness: cityState.happiness,
+          infrastructure: cityState.infrastructure
+        },
+        portfolio: cityState.portfolio.map((item) => item.companyId)
+      }, window.location.origin);
+    };
+
+    if (frame) {
+      frame.addEventListener("load", sendSmartCityState);
+      window.setTimeout(sendSmartCityState, 250);
     }
 
     document.getElementById("cityUpdateNextBtn").addEventListener("click", () => {
